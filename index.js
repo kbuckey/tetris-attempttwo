@@ -65,21 +65,24 @@ function createPiece() {
         
     }
     const update = () => {
-        if(pos.y < HEIGHT - 1) {
-        pos.y += 1;
-        }   
+        if(pos.y + shape.length >= HEIGHT) {
+            return; 
+        }
+        pos.y += 1; 
     }
 
     const moveLeft = () => {
-        if(pos.x > 0) {
-            pos.x -= 1
+        if(pos.x <= 0) {
+            return;
         }
+        pos.x -= 1
     };
 
     const moveRight = () => {
-        if(pos.x < WIDTH - 1) {
-            pos.x += 1
+        if(pos.x + shape[0].length >= WIDTH) {
+            return; 
         }
+        pos.x += 1
     };
 
     const moveDown = () => {
