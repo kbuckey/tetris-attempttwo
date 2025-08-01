@@ -29,15 +29,21 @@ function createPiece() {
         ctx.fillRect(pos.x * TILE_SIZE, pos.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
     const update = () => {
+        if(pos.y < HEIGHT - 1) {
         pos.y += 1;
+        }   
     }
 
     const moveLeft = () => {
-        pos.x -= 1
+        if(pos.x > 0) {
+            pos.x -= 1
+        }
     };
 
     const moveRight = () => {
-        pos.x += 1
+        if(pos.x < WIDTH - 1) {
+            pos.x += 1
+        }
     };
 
     const moveDown = () => {
