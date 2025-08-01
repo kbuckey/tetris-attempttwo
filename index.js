@@ -12,8 +12,32 @@ canvas.style.backgroundColor = 'black';
  
 let speed = DEFAULT_SPEED;
 
+const colors = [
+    'red', 
+    'orange',
+    'yellow', 
+    'green', 
+    'blue', 
+    'indigo', 
+    'purple'
+];
+
+const shapes = { 
+    L: [[1, 0], [1, 0], [1, 1]],
+    J: [[0, 1], [0, 1], [1, 1]],
+    T: [[1, 0], [1, 1], [1, 0]],
+    O: [[1, 1], [1, 1]],
+    I: [[1], [1], [1], [1]],
+    S: [[0, 1], [1, 1], [1, 0]],
+    Z: [[1, 0], [1, 1], [0, 1]]
+};
+
 const bg = createBg();
 const piece = createPiece(); 
+
+function getRandomNum(num) {
+   return Math.floor(Math.random() * num)
+}
 
 function createBg() {
     const render = () => {
@@ -24,9 +48,21 @@ function createBg() {
 
 function createPiece() {
     const pos = {x: WIDTH / 2, y: 0}
+
+    const random = getRandomNum(7);
+
+    let color = colors[random]
+    let shape = Object.values(shapes)[random];
     const render = () => {
-        ctx.fillStyle = 'red';
-        ctx.fillRect(pos.x * TILE_SIZE, pos.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        ctx.fillStyle = color;
+        shape.forEach((row, rowIdx) => {
+            row.forEach((col, colIdx) => {
+                if(col){
+                ctx.fillRect((pos.x + colIdx) * TILE_SIZE, (pos.y + rowIdx) * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                }
+            })
+        })
+        
     }
     const update = () => {
         if(pos.y < HEIGHT - 1) {
