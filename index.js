@@ -10,6 +10,7 @@ canvas.width = WIDTH * TILE_SIZE;
 canvas.height = HEIGHT * TILE_SIZE;
 canvas.style.backgroundColor = 'black';
  
+let speed = DEFAULT_SPEED;
 
 const bg = createBg();
 const piece = createPiece(); 
@@ -30,7 +31,60 @@ function createPiece() {
     const update = () => {
         pos.y += 1;
     }
-    return { render, update }
+
+    const moveLeft = () => {
+        pos.x -= 1
+    };
+
+    const moveRight = () => {
+        pos.x += 1
+    };
+
+    const moveDown = () => {
+        speed = 50; 
+    };
+
+    const stopMoveDown = () => {
+        speed = DEFAULT_SPEED;
+    };
+
+    const moveFns = {moveLeft, moveRight, moveDown, stopMoveDown}
+    //TODO: dereg keys
+    registerKeys(moveFns);
+    return { render, update };
+}
+
+function registerKeys(fns) {
+    function keyDown(e){
+        switch(e.key){
+            case 'ArrowLeft':
+                fns.moveLeft();
+                break;
+            case 'ArrowRight':
+                fns.moveRight();
+                break;
+            case 'ArrowDown': 
+                fns.moveDown();
+                break;    
+        }
+    }
+
+    function keyUp(e){
+        switch(e.key){
+            case 'ArrowDown': 
+                fns.stopMoveDown();
+                break;    
+        }
+    }
+
+    document.addEventListener('keydown', keyDown);
+    document.addEventListener('keyup', keyUp);
+
+    //cleanup function
+    return () => {
+        document.removeEventListener('keydown', keyDown);
+        document.removeEventListener('keyup', keyUp);
+    };
 }
 
 
@@ -44,7 +98,8 @@ function renderWorld() {
 }
 
 let startTime = 0;
-let speed = DEFAULT_SPEED;
+
+
 const loop = (elapsed) => {
     if (elapsed - startTime > 1000 / speed) {
         updateWorld();
