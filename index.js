@@ -34,7 +34,7 @@ const shapes = {
 
 const floor = createFloor();
 const bg = createBg();
-const piece = createPiece(); 
+const piece = createPiece(floor); 
 
 function getRandomNum(num) {
    return Math.floor(Math.random() * num)
@@ -46,7 +46,8 @@ function createTile({color, isEmpty}) {
             ctx.strokeStyle = 'white';
             ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         } else {
-            //TODO
+            ctx.fillStyle = color; 
+            ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
         }
     };
 
@@ -54,8 +55,9 @@ function createTile({color, isEmpty}) {
 }
 
 function createFloor() {
-    let tiles = Array(HEIGHT).fill(Array(WIDTH).fill(createTile({color: 'black', isEmpty: true})));
-
+    let tiles = Array(HEIGHT).fill([]).map(() =>
+        Array(WIDTH).fill(createTile({color: 'black', isEmpty: true}))
+    )
     const render = () => {
         tiles.forEach((row, rowIdx) => {
             row.forEach((tile, colIdx) => {
@@ -63,8 +65,13 @@ function createFloor() {
             })
         })
     }
-
-    return { render }; 
+    const fillTile = (col, row, color) => {
+        tiles[row][col] = createTile({
+            isEmpty: false,
+            color
+        })
+    }
+    return { render, fillTile };
 }
 
 function createBg() {
@@ -74,13 +81,19 @@ function createBg() {
     return { render }
 }
 
-function createPiece() {
-    const pos = {x: WIDTH / 2, y: 0}
-
-    const random = getRandomNum(7);
-
+function createPiece(floor) {
+    let pos = {x: WIDTH / 2, y: 0}
+    let random = getRandomNum(7);
     let color = colors[random]
     let shape = Object.values(shapes)[random];
+    
+    const reset = () => {
+        pos = {x: WIDTH / 2, y: 0}
+        random = getRandomNum(7);
+        color = colors[random]
+        shape = Object.values(shapes)[random];
+    }
+
     const render = () => {
         ctx.fillStyle = color;
         shape.forEach((row, rowIdx) => {
@@ -92,11 +105,24 @@ function createPiece() {
         })
         
     }
+
     const update = () => {
-        if(pos.y + shape.length >= HEIGHT) {
-            return; 
+        if (pos.y + shape.length >= HEIGHT) {
+            ctx.fillStyle = color;
+            shape.forEach((row, rowIdx) => {
+                row.forEach((tile, colIdx) => {
+                    if (!tile) return;
+                    const xPosPlusOffset = pos.x + colIdx;
+                    const yPosPlusOffset = pos.y + rowIdx;
+                    floor.fillTile(xPosPlusOffset, yPosPlusOffset, color)
+                })
+            })
+
+
+            reset();
+            return;
         }
-        pos.y += 1; 
+        pos.y += 1;
     }
 
     const moveLeft = () => {
@@ -104,22 +130,22 @@ function createPiece() {
             return;
         }
         pos.x -= 1
-    };
+    }
 
     const moveRight = () => {
         if(pos.x + shape[0].length >= WIDTH) {
             return; 
         }
         pos.x += 1
-    };
+    }
 
     const moveDown = () => {
         speed = 50; 
-    };
+    }
 
     const stopMoveDown = () => {
         speed = DEFAULT_SPEED;
-    };
+    }
 
     const moveFns = {moveLeft, moveRight, moveDown, stopMoveDown}
     //TODO: dereg keys
