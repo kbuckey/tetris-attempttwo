@@ -32,11 +32,39 @@ const shapes = {
     Z: [[1, 0], [1, 1], [0, 1]]
 };
 
+const floor = createFloor();
 const bg = createBg();
 const piece = createPiece(); 
 
 function getRandomNum(num) {
    return Math.floor(Math.random() * num)
+}
+
+function createTile({color, isEmpty}) {
+    const render = (x, y) => {
+        if (isEmpty) {
+            ctx.strokeStyle = 'white';
+            ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        } else {
+            //TODO
+        }
+    };
+
+    return { render };
+}
+
+function createFloor() {
+    let tiles = Array(HEIGHT).fill(Array(WIDTH).fill(createTile({color: 'black', isEmpty: true})));
+
+    const render = () => {
+        tiles.forEach((row, rowIdx) => {
+            row.forEach((tile, colIdx) => {
+                tile.render(colIdx, rowIdx);
+            })
+        })
+    }
+
+    return { render }; 
 }
 
 function createBg() {
@@ -139,6 +167,7 @@ function updateWorld() {
 
 function renderWorld() {
     bg.render();
+    floor.render();
     piece.render();
 }
 
@@ -152,6 +181,6 @@ const loop = (elapsed) => {
     }
     renderWorld();
     requestAnimationFrame(loop);
-};
+}
 
 requestAnimationFrame(loop);
